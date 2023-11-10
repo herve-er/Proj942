@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition API Tester</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+    <!-- Bootstrap Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Face Recognition API Tester</a>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Welcome to the Face Recognition API Tester</h1>
+        <p>This simple website allows you to test the Face Recognition API.</p>
+
+        <!-- User Enroll Form -->
+        <div class="card mt-4">
+            <div class="card-header">Enroll User</div>
+            <div class="card-body">
+                <form id="enrollUserForm">
+                    <div class="form-group">
+                        <label for="user_name">User Name:</label>
+                        <input type="text" class="form-control" id="user_name" name="user_name">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Enroll User</button>
+                </form>
+                <div id="enrollUserResponse"></div>
+            </div>
+        </div>
+
+        <!-- User Delete Form -->
+        <div class="card mt-4">
+            <div class="card-header">Delete User</div>
+            <div class="card-body">
+                <form id="deleteUserForm">
+                    <div class="form-group">
+                        <label for="delete_user_name">User Name:</label>
+                        <input type="text" class="form-control" id="delete_user_name" name="user_name">
+                    </div>
+                    <button type="submit" class="btn btn-danger">Delete User</button>
+                </form>
+                <div id="deleteUserResponse"></div>
+            </div>
+        </div>
+
+        <!-- Get Users List Button -->
+        <div class="card mt-4">
+            <div class="card-header">User List</div>
+            <div class="card-body">
+                <button class="btn btn-info" id="getUsersButton">Get Users List</button>
+                <div id="getUsersResponse"></div>
+            </div>
+        </div>
+
+        <!-- Face Recognition Form -->
+        <div class="card mt-4">
+            <div class="card-header">Recognize Face</div>
+            <div class="card-body">
+                <form id="recognizeFaceForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="image">Image File:</label>
+                        <input type="file" class="form-control-file" id="image" name="image">
+                    </div>
+                    <button type="submit" class="btn btn-success">Recognize Face</button>
+                </form>
+                <div id="recognizeFaceResponse"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS and jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Include your JavaScript for handling API requests -->
+    <script src="api.js"></script>
+</body>
+</html>
