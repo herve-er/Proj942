@@ -3,11 +3,10 @@ import hug
 import json
 import os
 from hug.middleware import CORSMiddleware
-
+from fonctionunique import
 from base64 import b64decode, b64encode
 from io import BytesIO
 from PIL import Image
-
 
 def get_users_list():
     with open('./users/users.json') as json_file:
