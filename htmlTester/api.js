@@ -1,6 +1,6 @@
 $(document).ready(function () {
     // Define the base URL for your API
-    var apiBaseUrl = "http://127.0.0.1:8000";
+    var apiBaseUrl = "http://localhost:8400";
 
     // Enroll User Form Submission
     $("#enrollUserForm").submit(function (e) {
@@ -47,7 +47,7 @@ $(document).ready(function () {
     function displayAlert(elementId, data) {
 		data = JSON.parse(data)
         var alertType = data.error ? "alert-danger" : "alert-success";
-        $("#" + elementId).html('<div class="alert ' + alert-success + ' mt-3" role="alert">' + data.message + '</div>');
+        var alertHTML = '<div class="alert ' + alertType + ' mt-3" role="alert">' + data.message + '</div>';
     }
 
     // Function to display the user list in a Bootstrap alert
