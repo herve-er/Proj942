@@ -3,27 +3,20 @@ import hug
 import json
 import os
 from hug.middleware import CORSMiddleware
-from fonctionunique import
+
+import fonctionunique
+from fonctionunique import *
 from base64 import b64decode, b64encode
 from io import BytesIO
 from PIL import Image
 
+DB_PATH = "./users/"
 def get_users_list():
-    with open('./users/users.json') as json_file:
+    with open(DB_PATH + "users.json") as json_file:
         data = json.load(json_file)
         return data["user_list"]
 
-@hug.not_found()
-def not_found_handler(request, **kwargs):
-    # Accéder aux détails de la requête
-    request_method = request.method  # Méthode de la requête (GET, POST, etc.)
-    request_path = request.path  # Chemin de la requête
 
-    # Autres détails de la requête disponibles dans l'objet 'request'
-
-    # Retourner une réponse avec les détails de la requête
-    print(f"La requête {request_method} pour {request_path} n'a pas été trouvée.")
-    return "404"
 
 @hug.post('/enrollUser')
 # add user to database
@@ -35,12 +28,12 @@ def enrollUser(user_name: hug.types.text):
                 return json.dumps({'error': 'User already exists'})
             else:
                 # MakeAdirectory
-                os.makedirs('./users/' + user_name)
+                os.makedirs(DB_PATH + user_name)
                 # Add user to database
                 user_list.append(user_name)
                 data = {}
                 data["user_list"] = user_list
-                with open('users/users.json', 'w') as outfile:
+                with open(DB_PATH + '/users.json', 'w') as outfile:
                     json.dump(data, outfile)
 
             return json.dumps({'message': 'User added'})
@@ -83,6 +76,18 @@ def getUsers():
 def convertImgRawToBase64(imgRaw):
     return b64encode(imgRaw)
 
+def saveImg(file_path, rawimage):
+    #check if the image is base64 encoded
+    img = rawimage
+    try:
+        rawimage.startswith(b'b\'')
+    except:
+        img = b64decode(rawimage)
+
+    # Enregistrez l'image dans un fichier
+    with open(file_path, 'wb') as image_file:
+        image_file.write(img)
+
 @hug.post('/addFaceData')
 def upload_file(image_data: "image", user_name: hug.types.text):
     try:
@@ -100,17 +105,15 @@ def upload_file(image_data: "image", user_name: hug.types.text):
                 date_str = datetime.now().strftime("%Y%m%d-%H%M%S")
                 print(date_str)
                 # Spécifiez le chemin du fichier où vous souhaitez enregistrer l'image
-                file_path = './users/' + user_name + '/' + date_str + '.jpg'  # Modifiez selon vos besoins
+                file_path = "temp_add.jpg"  # Modifiez selon vos besoins
                 print(file_path)
-                print("img: ", image_data)
+                saveImg(file_path, image_data)
 
-                # image data is a string (L+YxfcQmVZBz1NXFXOVqzsUb64a3fy7ZItrEkhhkn6VlW0jNM7yssIfJ2yf... --> convert to bytes
-                img = b64decode(image_data)
-                print("img: ", img)
-
-                # Enregistrez l'image dans un fichier
-                with open(file_path, 'wb') as image_file:
-                    image_file.write(img)
+                img = cv2.imread(file_path)
+                img = fonctionunique.crop(img)
+                file_path = DB_PATH + user_name + '/' + date_str + '.jpg'  # Modifiez selon vos besoins
+                img = fonctionunique.redim(img, 300)
+                cv2.imwrite(file_path, img)
 
                 return json.dumps({'message': 'Image enregistree avec succes'})
             else:
@@ -122,28 +125,31 @@ def upload_file(image_data: "image", user_name: hug.types.text):
 
 @hug.post('/recognizeFace')
 def recognizeFace(image_data = "image"):
+    print("recognizeFace")
     try:
         if image_data:
             # Spécifiez le chemin du fichier où vous souhaitez enregistrer l'image
-            file_path = './temp.png'  # Modifiez selon vos besoins
+            file_path = DB_PATH + 'temp.png'  # Modifiez selon vos besoins
 
             # Enregistrez l'image dans un fichier
-            with open(file_path, 'wb') as image_file:
-                image_file.write(image_data)
+            saveImg(file_path, image_data)
 
-            #Fonction de reconnaissance
-            #TODO en attente de la fonction de reconnaissance on demande d'entrée dans la consol
-            res = input("User_name: ")
-
-
-            res = "User_name res"
+            res = fonctionunique.reconnaissace_visage(file_path)
+            json_res = json.dumps({'user_name': res})
+            print(json_res)
             return json.dumps({'user_name': res})
 
     except Exception as e:
+        print(json.dumps({'error': str(e)}))
         return json.dumps({'error': str(e)})
 
+def start(ip):
+    #intit face recognition
+    user_list = get_users_list()
+    for user in user_list:
+        fonctionunique.addUser(user)
 
-def start():
+    print(fonctionunique.num_to_name)
     # Initialize your hug API
     api = hug.API(__name__)
 
@@ -153,4 +159,4 @@ def start():
     # Apply the CORS middleware to your API
     api.http.add_middleware(cors_middleware)
     # Run your API on port 8000
-    api.http.serve(port=8400)
+    api.http.serve(port=8400, host=ip)

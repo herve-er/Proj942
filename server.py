@@ -12,8 +12,8 @@ class CORSRequestHandler (SimpleHTTPRequestHandler):
 
 
 
-def start():
+def start(ip):
     # init the server with root at "./website_config/website/"
-    test(CORSRequestHandler, HTTPServer, port=port)
+    test(CORSRequestHandler, HTTPServer, port=port, bind=ip)
 
 

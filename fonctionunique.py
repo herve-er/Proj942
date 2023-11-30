@@ -230,7 +230,7 @@ class EigenfacesModel(BaseModel):
 
 def predict(path,X,y,nouvelle_taille):
     # Chargez le classificateur Haar Cascade pré-entraîné pour la détection faciale
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
     
     # Chargez l'image
     im = cv2.imread(path)
@@ -244,7 +244,6 @@ def predict(path,X,y,nouvelle_taille):
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(50, 50))
         if len(faces)==0:
             raise Exception("Aucun visage n'a été détecté dans l'image.")
-        print(len(faces))
         # Enregistrez chaque visage détecté dans le dossier des résultats des visages
         for i, (x, y, w, h) in enumerate(faces):
             # Récupérer la région d'intérêt (ROI) du visage
@@ -254,10 +253,10 @@ def predict(path,X,y,nouvelle_taille):
             nom_fichier_visage = f'{os.path.splitext(os.path.basename(path))[0]}.jpg'
             
             # Afficher le visage
-            cv2.imshow(f"Visage {i}", face_roi)
+            '''cv2.imshow(f"Visage {i}", face_roi)
             cv2.waitKey(0)
 
-            cv2.destroyAllWindows()
+            cv2.destroyAllWindows()'''
 
             # Demander à l'utilisateur si le visage est correct
           
@@ -311,22 +310,71 @@ def init(path_base_image):
     [D, W, mu] = pca(asRowMatrix(X), y)
     return(X,y)
     
-num_to_name = {
-        0: "Ewan",
+num_to_name = {}
+'''
+    0: "Ewan",
         1: "Herve",
         2: "Jules",
         3: "Lucas",
         4: "Medhi",
         5: "Sarah",
-        6: "Zaide",
-        # Ajoutez d'autres correspondances ici
-    }
+        6: "Zaide"
+        # Ajoutez automatiquement par le programme depuis la base d'image
+    }'''
 
-path_base_image="base_sni"
+def addUser(user_name):
+    num_to_name[len(num_to_name)] = user_name
+
+path_base_image= './users'
 dossier_resultats = 'temp'
 # Appeler les fonctions
 X,y=init(path_base_image)
-predictions=predict("test/20231121_160521.jpg",X,y,300)
+
+
+def crop(im):
+    # Redimensionnez l'image à la nouvelle taille
+    nouvelle_longueur = 300
+    ratio = nouvelle_longueur / im.shape[1]
+    nouvelle_largeur = int(im.shape[0] * ratio)
+    image_redimensionnee = cv2.resize(im, (nouvelle_longueur, nouvelle_largeur))
+
+    im = image_redimensionnee
+    # Charger le classificateur de visages pré-entrainé
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+
+    try:
+        # Détecter les visages dans l'image
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+        if len(faces) == 0:
+            raise Exception("Une erreur s'est produite : pas de détection de visage", 500)
+
+    except Exception as e:
+        # Gérer l'exception
+        print(f"Erreur__ : {e}")
+
+    # Parcourir la liste des visages détectés et les afficher
+    for (x, y, w, h) in faces:
+        # Dessiner un rectangle autour du visage
+        cv2.rectangle(im, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
+        # Récupérer la région d'intérêt (ROI) du visage
+        face_roi = gray[y:y + h, x:x + w]
+
+        # Afficher le visage
+        #cv2.imshow('Face', face_roi)
+        #cv2.waitKey(0)  # Attendre une touche pour passer au visage suivant
+        #cv2.destroyAllWindows()
+        return face_roi
+
+    return faces
+
+
+def reconnaissace_visage(path):
+    res = predict(path,X,y,300)
+    return res
+
+predictions=predict(path_base_image + '/Ewan/Ewan (1)_visage_1.jpg',X,y,300)
 print('la prediction du visage est celle de:', predictions)
 #ajout_a_la_base(prediction,chemin_visage_crop)
 

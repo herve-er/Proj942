@@ -1,6 +1,6 @@
 $(document).ready(function () {
     // Define the base URL for your API
-    var apiBaseUrl = "http://localhost:8400";
+    var apiBaseUrl = "http://192.168.39.37:8400";
 
     // Enroll User Form Submission
     $("#enrollUserForm").submit(function (e) {
@@ -39,6 +39,7 @@ $(document).ready(function () {
             processData: false,
             success: function (data) {
                 displayAlert("recognizeFaceResponse", data);
+                console.log(data);
             }
         });
     });
@@ -47,7 +48,8 @@ $(document).ready(function () {
     function displayAlert(elementId, data) {
 		data = JSON.parse(data)
         var alertType = data.error ? "alert-danger" : "alert-success";
-        var alertHTML = '<div class="alert ' + alertType + ' mt-3" role="alert">' + data.message + '</div>';
+        var alertHTML = '<div class="alert ' + alertType + ' mt-3" role="alert">' + data.user_name + '</div>';
+        $("#" + elementId).html(alertHTML);
     }
 
     // Function to display the user list in a Bootstrap alert
